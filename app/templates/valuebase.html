@@ -1,0 +1,66 @@
+{% load django_tables2 %}
+{% load static %}
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'django_tables2/themes/paleblue/css/screen.css' %}"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="{% static "jquery.min.js" %}"></script>
+    {# require #}
+    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "django_tables2_column_shifter/js/django_tables2_column_shifter.min.js" %}"></script>
+</head>
+<body>
+<div class="container" style="margin-top: 3rem; margin-bottom: 3rem">
+    <div class="row">
+        <form method="get">
+            <div class="form-group">
+                {% for field in form %}
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">{{ field.label_tag }}</label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endfor %}
+                <button class="btn btn-primary" id="filter_submit_button" type="submit">Поиск</button>
+            </div>
+        </form>
+
+        {% render_table valuebase %}
+    </div>
+    <form method="get">
+        <p>{{ form.min_date_res }}</p>
+        <p>{{ form.max_date_res }}</p>
+
+        <table border="2px" WIDTH="80%">
+            <TR style="color: white; background-color: #2e2e2e">
+                <TH rowspan="3">ТО</TH>
+                <TH rowspan="3">Город</TH>
+                <TH rowspan="3">Офис</TH>
+                <TH colspan="2">Группа показателей</TH>
+                <TH colspan="2">Показатель</TH>
+            </TR>
+            <TR style="color: white; background-color: #2e2e2e">
+                <TD>Активные клиенты</TD>
+                <TD>Кредитные карты</TD>
+                <TD>NBI</TD>
+                <TD>Costs</TD>
+            </TR>
+            <TR style="color: white; background-color: #2e2e2e">
+                <TD>Результаты за период</TD>
+                <TD>Результаты за период</TD>
+                <TD>Результаты за период</TD>
+                <TD>Результаты за период</TD>
+            </TR>
+            <tr>
+                <TD>{{ form.bt_res }}</TD>
+                <TD>{{ form.city_res }}</TD>
+                <TD>{{ form.office_res }}</TD>
+                <TD>{{ act_clients.value__avg }}</TD>
+        </table>
+        <button class="btn btn-primary" id="res_submit_button" type="submit">Поиск</button>
+    </form>
+</div>
+</body>
+</html>
