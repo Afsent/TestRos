@@ -1,66 +1,153 @@
 {% load django_tables2 %}
 {% load static %}
+{% load googlecharts %}
+{% load bootstrap4 %}
 <!doctype html>
 <html>
 <head>
+    <style>
+        td.red {
+            color: orangered;
+            background-color: rgba(255, 134, 0, 0.26);
+            font-weight: bold;
+        }
+
+        td.grey {
+            color: grey;
+            font-weight: bold;
+        }
+
+        td.green {
+            color: green;
+            background-color: rgba(0, 188, 86, 0.22);
+            font-weight: bold;
+        }
+    </style>
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
     <link rel="stylesheet" href="{% static 'django_tables2/themes/paleblue/css/screen.css' %}"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="{% static "jquery.min.js" %}"></script>
-    {# require #}
-    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
-    <script src="{% static "django_tables2_column_shifter/js/django_tables2_column_shifter.min.js" %}"></script>
+    <script
+        type="text/javascript"
+        src="{% static "django_tables2_column_shifter/js/django_tables2_column_shifter.min.js" %}">
+    </script>
 </head>
 <body>
 <div class="container" style="margin-top: 3rem; margin-bottom: 3rem">
-    <div class="row">
-        <form method="get">
-            <div class="form-group">
-                {% for field in form %}
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">{{ field.label_tag }}</label>
-                        <div class="col-sm-10">
-                            {{ field }}
-                        </div>
-                    </div>
-                {% endfor %}
-                <button class="btn btn-primary" id="filter_submit_button" type="submit">Поиск</button>
-            </div>
-        </form>
-
-        {% render_table valuebase %}
+    {# форма таблицы и фильтра #}
+    <div class="form-group row">
+        <div class="col col-9">
+            {% render_table valuebase %}
+        </div>
+        <div class="col col-3">
+            <form method="post">
+                <div>
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    <button class="btn btn-primary" style="width: 100%" type="submit">Поиск</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <form method="get">
-        <p>{{ form.min_date_res }}</p>
-        <p>{{ form.max_date_res }}</p>
+    {# форма таблицы показателей #}
+    <form method="post" name="res_form">
+        {% csrf_token %}
+        <div class="form-group">
+            <div style="width: max-content">
+                {% bootstrap_field res_form.min_date_res %}
+                {% bootstrap_field res_form.max_date_res %}
+            </div>
+            <button class="btn btn-success" type="submit">Показать статистику</button>
+        </div>
+        <div>
+            <table class="table" style="text-align: center">
+                <thead class="thead-dark">
+                <tr>
+                    <th rowspan="3" style="text-align: center">ТО</th>
+                    <th rowspan="3" style="text-align: center">Город</th>
+                    <th rowspan="3" style="text-align: center">Офис</th>
+                    <th colspan="2" style="text-align: center">Портфель</th>
+                    <th colspan="2" style="text-align: center">Финансовые</th>
+                </tr>
+                <tr style="background-color: lightgrey">
+                    <td>Активные клиенты</td>
+                    <td>Кредитные карты</td>
+                    <td>NBI</td>
+                    <td>Costs</td>
+                </tr>
+                <tr style="background-color: whitesmoke">
+                    <td>Результаты за период</td>
+                    <td>Результаты за период</td>
+                    <td>Результаты за период</td>
+                    <td>Результаты за период</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{ res_form.bt_res }}</td>
+                    <td>{{ res_form.city_res }}</td>
+                    <td>{{ res_form.office_res }}</td>
+                    {# цветовая маркировка показателей #}
+                    {% if act_clients >= 104 %}
+                        <td class="green">{{ act_clients }}%</td> {% endif %}
+                    {% if act_clients >= 98 and act_clients < 104 %}
+                        <td class="grey">{{ act_clients }}%</td> {% endif %}
+                    {% if act_clients < 98 %}
+                        <td class="red">{{ act_clients }}%</td> {% endif %}
 
-        <table border="2px" WIDTH="80%">
-            <TR style="color: white; background-color: #2e2e2e">
-                <TH rowspan="3">ТО</TH>
-                <TH rowspan="3">Город</TH>
-                <TH rowspan="3">Офис</TH>
-                <TH colspan="2">Группа показателей</TH>
-                <TH colspan="2">Показатель</TH>
-            </TR>
-            <TR style="color: white; background-color: #2e2e2e">
-                <TD>Активные клиенты</TD>
-                <TD>Кредитные карты</TD>
-                <TD>NBI</TD>
-                <TD>Costs</TD>
-            </TR>
-            <TR style="color: white; background-color: #2e2e2e">
-                <TD>Результаты за период</TD>
-                <TD>Результаты за период</TD>
-                <TD>Результаты за период</TD>
-                <TD>Результаты за период</TD>
-            </TR>
-            <tr>
-                <TD>{{ form.bt_res }}</TD>
-                <TD>{{ form.city_res }}</TD>
-                <TD>{{ form.office_res }}</TD>
-                <TD>{{ act_clients.value__avg }}</TD>
-        </table>
-        <button class="btn btn-primary" id="res_submit_button" type="submit">Поиск</button>
+                    {% if credit_cards >= 104 %}
+                        <td class="green">{{ credit_cards }}%</td> {% endif %}
+                    {% if credit_cards >= 98 and credit_cards < 104 %}
+                        <td class="grey">{{ credit_cards }}%</td> {% endif %}
+                    {% if credit_cards < 98 %}
+                        <td class="red">{{ credit_cards }}%</td> {% endif %}
+
+                    {% if costs >= 104 %}
+                        <td class="green">{{ costs }}%</td> {% endif %}
+                    {% if costs >= 98 and costs < 104 %}
+                        <td class="grey">{{ costs }}%</td> {% endif %}
+                    {% if costs < 98 %}
+                        <td class="red">{{ costs }}%</td> {% endif %}
+
+                    {% if nbi >= 104 %}
+                        <td class="green">{{ nbi }}%</td> {% endif %}
+                    {% if nbi >= 98 and nbi < 104 %}
+                        <td class="grey">{{ nbi }}%</td> {% endif %}
+                    {% if nbi < 98 %}
+                        <td class="red">{{ nbi }}%</td> {% endif %}
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </form>
+
+    {# график #}
+    <div id="avg_graph"></div>
+
+    {% googlecharts %}
+        {% data graph "avg" %}
+            {% col "string" "Date" %}"{{ val|date:"M j" }}"{% endcol %}
+            {% col "number" "Среднее значение" %}{{ val }}{% endcol %}
+        {% enddata %}
+
+        {% options %}
+            kind: "ColumnChart",
+            options: {
+            backgroundColor: "#f9f9f9",
+            colors: ["#09f"],
+            gridlineColor: "#ddd",
+            legend: "none",
+            vAxis: {minValue: 0},
+            chartArea: {left: 40, top: 20, width: 500, height: 400},
+            width: 600,
+            height: 480
+            }
+        {% endoptions %}
+
+        {% graph "avg_graph" "avg" %} {# используем опции по умолчанию #}
+    {% endgooglecharts %}
+</div>
+
 </div>
 </body>
 </html>

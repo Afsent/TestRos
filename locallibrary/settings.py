@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app.apps.AppConfig',
     'django_tables2',
+    'bootstrap4',
+    'googlecharts',
+    'django_tables2_column_shifter',
 ]
 
 MIDDLEWARE = [
