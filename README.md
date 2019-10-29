@@ -10,5 +10,5 @@
   данных, диаграммами, цветовыми маркировками
   
   
-# DataBase Schema
+# Диаграмма Базы Данных в MS SQl Server
 ![Image alt](https://github.com/Afsent/TestRos/raw/master/images/db_diagram.PNG)
